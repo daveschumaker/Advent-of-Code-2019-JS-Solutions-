@@ -2,15 +2,33 @@
 
 const rocketMassArray = require('./input.json');
 
-// PART I: Calculate fuel needed for rocket.
-
+// Calculate fuel needed for a given mass.
 const calcFuel = (mass) => {
     return Math.floor(mass / 3) - 2;
 }
 
+// Recursively calculate fuel needed for a given mass of fuel.
+const calcFuelForFuel = (fuelMass, totalFuelRequired = 0) => {
+    const newFuelMass = calcFuel(fuelMass);
 
-const fuelRequirements = rocketMassArray.reduce((totalFuel, mass) => {
+    if (newFuelMass <= 0) {
+        return totalFuelRequired;
+    }
+
+    totalFuelRequired += newFuelMass;
+
+    return calcFuelForFuel(newFuelMass, totalFuelRequired);
+}
+
+const totalFuelForModule = rocketMassArray.reduce((totalFuel, mass) => {
     return totalFuel + calcFuel(mass);
 }, 0);
 
-console.log('Total Fuel Required:', fuelRequirements);
+const totalFuelForModuleAndFuel = rocketMassArray.reduce((totalFuel, mass) => {
+    const fuelForModule = calcFuel(mass);
+    const fuelForFuel = calcFuelForFuel(fuelForModule);
+    return totalFuel + fuelForModule + fuelForFuel
+}, 0);
+
+console.log('Required Fuel for Module:', totalFuelForModule);
+console.log('Required Fuel for Module + Fuel:', totalFuelForModuleAndFuel);
